@@ -8,9 +8,9 @@ const jsonCredentials = require("../service-account.json");
 
 const analyticsDataClient = new BetaAnalyticsDataClient({
   // Use the 'credentials' option when passing an object directly
-  credentials: jsonCredentials,
+  credentials: PROCESS.env.GOOGLE_APPLICATION_CREDENTIALS,
 });
-const PROPERTY_ID = "525484811";
+const PROPERTY_ID = PROCESS.env.GA4_PROPERTY_ID;
 /**
  * CREATE EVENT (Single or Recurring)
  */

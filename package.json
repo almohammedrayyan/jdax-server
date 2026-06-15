@@ -1,0 +1,25 @@
+{
+  "name": "ai-calendar-system",
+  "version": "1.0.0",
+  "description": "AI meeting calendar invite system with Node.js, MongoDB, ICS and SMTP",
+  "main": "src/app.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "@google-analytics/data": "^6.1.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "ical-generator": "^10.0.0",
+    "moment": "^2.30.1",
+    "mongoose": "^9.2.1",
+    "nodemailer": "^8.0.1",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

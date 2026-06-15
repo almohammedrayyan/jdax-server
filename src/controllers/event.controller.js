@@ -6,7 +6,7 @@ const { buildCalendar } = require("../services/calendar.services");
 const { BetaAnalyticsDataClient } = require("@google-analytics/data");
 
 const analyticsDataClient = new BetaAnalyticsDataClient({});
-const PROPERTY_ID = PROCESS.env.GA4_PROPERTY_ID;
+const PROPERTY_ID = process.env.GA4_PROPERTY_ID;
 /**
  * CREATE EVENT (Single or Recurring)
  */

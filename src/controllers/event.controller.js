@@ -4,7 +4,6 @@ const RecurringMeeting = require("../models/recurring.models");
 const { sendInviteMail } = require("../services/mail.services");
 const { buildCalendar } = require("../services/calendar.services");
 const { BetaAnalyticsDataClient } = require("@google-analytics/data");
-const jsonCredentials = require("../service-account.json");
 
 const analyticsDataClient = new BetaAnalyticsDataClient({});
 const PROPERTY_ID = PROCESS.env.GA4_PROPERTY_ID;

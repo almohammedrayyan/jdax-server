@@ -6,10 +6,7 @@ const { buildCalendar } = require("../services/calendar.services");
 const { BetaAnalyticsDataClient } = require("@google-analytics/data");
 const jsonCredentials = require("../service-account.json");
 
-const analyticsDataClient = new BetaAnalyticsDataClient({
-  // Use the 'credentials' option when passing an object directly
-  credentials: PROCESS.env.GOOGLE_APPLICATION_CREDENTIALS,
-});
+const analyticsDataClient = new BetaAnalyticsDataClient({});
 const PROPERTY_ID = PROCESS.env.GA4_PROPERTY_ID;
 /**
  * CREATE EVENT (Single or Recurring)

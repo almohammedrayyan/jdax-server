@@ -5,7 +5,13 @@ const { sendInviteMail } = require("../services/mail.services");
 const { buildCalendar } = require("../services/calendar.services");
 const { BetaAnalyticsDataClient } = require("@google-analytics/data");
 
-const analyticsDataClient = new BetaAnalyticsDataClient({});
+const analyticsDataClient = new BetaAnalyticsDataClient({
+  credentials: {
+    project_id: process.env.GOOGLE_PROJECT_ID,
+    client_email: process.env.GOOGLE_CLIENT_EMAIL,
+    private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+  },
+});
 const PROPERTY_ID = process.env.GA4_PROPERTY_ID;
 /**
  * CREATE EVENT (Single or Recurring)

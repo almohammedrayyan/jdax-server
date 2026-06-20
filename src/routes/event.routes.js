@@ -10,4 +10,5 @@ router.post("/create", controller.createEvent);
 router.put("/update/:id", controller.updateEvent);
 router.delete("/cancel/:id", controller.cancelEvent);
 router.get("/realtime-visitors", controller.getRealTimeVisitors);
+
 module.exports = router;

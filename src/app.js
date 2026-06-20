@@ -4,7 +4,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 
 const eventRoutes = require("./routes/event.routes");
-
+const contactRoutes = require("./routes/contact.routes");
 const app = express();
 
 connectDB();
@@ -30,6 +30,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/api/events", eventRoutes);
+app.use("/api/contacts", contactRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running at http://localhost:${process.env.PORT}`);

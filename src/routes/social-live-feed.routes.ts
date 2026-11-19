@@ -1,0 +1,12 @@
+const express = require("express");
+const controller = require("../controllers/social-live-feed.controller");
+
+const router = express.Router();
+
+router.post("/", controller.createSocialLiveFeed);
+router.get("/", controller.getSocialLiveFeeds);
+router.get("/:id", controller.getSocialLiveFeedById);
+router.put("/:id", controller.updateSocialLiveFeed);
+router.delete("/:id", controller.deleteSocialLiveFeed);
+
+export = router;

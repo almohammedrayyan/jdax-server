@@ -1,0 +1,40 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const contentScheduleRoutes = require("./routes/content-schedule.routes");
+const socialLiveFeedRoutes = require("./routes/social-live-feed.routes");
+const authRoutes = require("./routes/auth.routes");
+const connectDB = require("./config/db");
+const eventRoutes = require("./routes/event.routes");
+const contactRoutes = require("./routes/contact.routes");
+const app = express();
+connectDB();
+const allowedOrigins = ["https://jdax.in", "http://localhost:5173"];
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps, curl, or postman)
+        if (!origin)
+            return callback(null, true);
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        }
+        else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+    optionsSuccessStatus: 204,
+};
+app.use(cors(corsOptions));
+app.use(express.json());
+app.use("/api/events", eventRoutes);
+app.use("/api/contacts", contactRoutes);
+app.use("/api/content-schedules", contentScheduleRoutes);
+app.use("/api/social-live-feeds", socialLiveFeedRoutes);
+app.use("/api/auth", authRoutes);
+app.listen(process.env.PORT, () => {
+    console.log(`Server running at http://localhost:${process.env.PORT}`);
+});

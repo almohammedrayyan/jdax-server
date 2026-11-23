@@ -51,4 +51,5 @@ const saveTodaySnapshot = async () => {
     });
 };
 const getAllSnapshots = async () => DashboardUser.find().sort({ snapshotDate: -1 });
-module.exports = { ANALYTICS_START_DATE, getMetrics, saveTodaySnapshot, getAllSnapshots };
+const getLatestSnapshot = async () => DashboardUser.findOne().sort({ snapshotDate: -1 });
+module.exports = { ANALYTICS_START_DATE, getMetrics, saveTodaySnapshot, getAllSnapshots, getLatestSnapshot };

@@ -5,7 +5,7 @@ const Event = require("../models/event.models");
 const RecurringMeeting = require("../models/recurring.models");
 const { sendInviteMail } = require("../services/mail.services");
 const { buildCalendar } = require("../services/calendar.services");
-const { getAllSnapshots } = require("../services/dashboard-user.service");
+const { getLatestSnapshot } = require("../services/dashboard-user.service");
 /**
  * CREATE EVENT (Single or Recurring)
  */
@@ -80,8 +80,7 @@ exports.cancelEvent = async (req, res) => {
 };
 exports.getRealTimeVisitors = async (req, res) => {
     try {
-        const data = await getAllSnapshots();
-        const latest = data[0];
+        const latest = await getLatestSnapshot();
         res.json({
             success: true,
             message: "Dashboard visitor snapshots fetched.",
@@ -89,16 +88,7 @@ exports.getRealTimeVisitors = async (req, res) => {
             newUsers: latest?.newUsers ?? 0,
             totalSessions: latest?.totalSessions ?? 0,
             totalViews: latest?.totalViews ?? 0,
-            data: {
-                latest: {
-                    totalUsers: latest?.totalUsers ?? 0,
-                    newUsers: latest?.newUsers ?? 0,
-                    totalSessions: latest?.totalSessions ?? 0,
-                    totalViews: latest?.totalViews ?? 0,
-                    snapshotDate: latest?.snapshotDate ?? null,
-                },
-                snapshots: data,
-            },
+            snapshotDate: latest?.snapshotDate ?? null,
         });
     }
     catch (error) {

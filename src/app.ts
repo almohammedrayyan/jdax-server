@@ -5,12 +5,12 @@ const contentScheduleRoutes = require("./routes/content-schedule.routes");
 const socialLiveFeedRoutes = require("./routes/social-live-feed.routes");
 const authRoutes = require("./routes/auth.routes");
 const connectDB = require("./config/db");
+const { startDashboardUserCron } = require("./jobs/dashboard-user.cron");
 
 const eventRoutes = require("./routes/event.routes");
 const contactRoutes = require("./routes/contact.routes");
 
 const app = express();
-connectDB();
 
 const allowedOrigins = ["https://jdax.in", "http://localhost:5173"];
 const corsOptions = {
@@ -39,6 +39,15 @@ app.use("/api/content-schedules", contentScheduleRoutes);
 app.use("/api/social-live-feeds", socialLiveFeedRoutes);
 app.use("/api/auth", authRoutes);
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server running at http://localhost:${process.env.PORT}`);
+const startServer = async () => {
+  await connectDB();
+  startDashboardUserCron();
+  app.listen(process.env.PORT, () => {
+    console.log(`Server running at http://localhost:${process.env.PORT}`);
+  });
+};
+
+startServer().catch((error) => {
+  console.error("Unable to start server:", error);
+  process.exit(1);
 });

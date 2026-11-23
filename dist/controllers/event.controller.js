@@ -5,15 +5,7 @@ const Event = require("../models/event.models");
 const RecurringMeeting = require("../models/recurring.models");
 const { sendInviteMail } = require("../services/mail.services");
 const { buildCalendar } = require("../services/calendar.services");
-const { BetaAnalyticsDataClient } = require("@google-analytics/data");
-const analyticsDataClient = new BetaAnalyticsDataClient({
-    credentials: {
-        project_id: process.env.GOOGLE_PROJECT_ID,
-        client_email: process.env.GOOGLE_CLIENT_EMAIL,
-        private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-    },
-});
-const PROPERTY_ID = process.env.GA4_PROPERTY_ID;
+const { getAllSnapshots } = require("../services/dashboard-user.service");
 /**
  * CREATE EVENT (Single or Recurring)
  */
@@ -88,44 +80,18 @@ exports.cancelEvent = async (req, res) => {
 };
 exports.getRealTimeVisitors = async (req, res) => {
     try {
-        const [response] = await analyticsDataClient.runReport({
-            property: `properties/${PROPERTY_ID}`,
-            dateRanges: [
-                {
-                    startDate: "2020-01-01", // Adjust to your platform's tracking launch date
-                    endDate: "today",
-                },
-            ],
-            metrics: [
-                { name: "totalUsers" },
-                { name: "newUsers" },
-                { name: "sessions" },
-                { name: "screenPageViews" },
-            ],
-        });
-        // Handle structural safety check for pristine or empty properties
-        if (!response.rows || response.rows.length === 0) {
-            return res.json({
-                totalUsers: 0,
-                newUsers: 0,
-                totalSessions: 0,
-                totalViews: 0,
-            });
-        }
-        // Map rows arrays safely to match index sequence order defined above
-        const totalUsers = response.rows[0].metricValues[0].value;
-        const newUsers = response.rows[0].metricValues[1].value;
-        const totalSessions = response.rows[0].metricValues[2].value;
-        const totalViews = response.rows[0].metricValues[3].value;
+        const data = await getAllSnapshots();
+        const latest = data[0];
         res.json({
-            totalUsers: parseInt(totalUsers, 10),
-            newUsers: parseInt(newUsers, 10),
-            totalSessions: parseInt(totalSessions, 10),
-            totalViews: parseInt(totalViews, 10),
+            totalUsers: latest?.totalUsers ?? 0,
+            newUsers: latest?.newUsers ?? 0,
+            totalSessions: latest?.totalSessions ?? 0,
+            totalViews: latest?.totalViews ?? 0,
+            data,
         });
     }
     catch (error) {
-        console.error("Error hitting Google Data API:", error);
-        res.status(500).json({ error: "Failed to parse platform metrics dataset" });
+        console.error("Error reading dashboard visitor snapshots:", error);
+        res.status(500).json({ error: "Failed to fetch dashboard visitor snapshots" });
     }
 };

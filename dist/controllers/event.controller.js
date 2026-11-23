@@ -83,11 +83,22 @@ exports.getRealTimeVisitors = async (req, res) => {
         const data = await getAllSnapshots();
         const latest = data[0];
         res.json({
+            success: true,
+            message: "Dashboard visitor snapshots fetched.",
             totalUsers: latest?.totalUsers ?? 0,
             newUsers: latest?.newUsers ?? 0,
             totalSessions: latest?.totalSessions ?? 0,
             totalViews: latest?.totalViews ?? 0,
-            data,
+            data: {
+                latest: {
+                    totalUsers: latest?.totalUsers ?? 0,
+                    newUsers: latest?.newUsers ?? 0,
+                    totalSessions: latest?.totalSessions ?? 0,
+                    totalViews: latest?.totalViews ?? 0,
+                    snapshotDate: latest?.snapshotDate ?? null,
+                },
+                snapshots: data,
+            },
         });
     }
     catch (error) {

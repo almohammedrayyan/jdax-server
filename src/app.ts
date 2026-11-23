@@ -12,7 +12,11 @@ const contactRoutes = require("./routes/contact.routes");
 
 const app = express();
 
-const allowedOrigins = ["https://jdax.in", "http://localhost:5173"];
+const allowedOrigins = [
+  "https://jdax.in",
+  "http://localhost:5173",
+  ...(process.env.ADMIN_ORIGINS ?? "").split(",").map((origin: string) => origin.trim()).filter(Boolean),
+];
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps, curl, or postman)

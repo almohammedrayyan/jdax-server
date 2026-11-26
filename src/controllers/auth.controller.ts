@@ -28,4 +28,16 @@ const login = async (req: Request, res: Response) => {
   }
 };
 
-export = { register, login };
+const me = async (req: Request & { userId?: string }, res: Response) => {
+  try {
+    const user = await service.getUser(req.userId);
+    if (!user) return res.status(404).send({ success: false, message: "User not found.", data: null });
+    return res.status(200).send({ success: true, data: user });
+  } catch (error) {
+    return sendError(res, error as AppError);
+  }
+};
+
+const logout = (_req: Request, res: Response) => res.status(200).send({ success: true, message: "Logged out. Discard the token on the client.", data: null });
+
+export = { register, login, me, logout };

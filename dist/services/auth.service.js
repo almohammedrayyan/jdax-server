@@ -27,15 +27,30 @@ const register = async (body) => {
     const name = body.name?.trim();
     const email = normaliseEmail(body.email);
     const password = body.password || "";
+    if (!name)
+        throw appError("name is required.", 400);
+    if (name.length > 100)
+        throw appError("name must contain at most 100 characters.", 400);
     if (!email || !password)
         throw appError("email and password are required.", 400);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+        throw appError("Enter a valid email address.", 400);
     if (password.length < 8)
         throw appError("password must contain at least 8 characters.", 400);
     const existingUser = await user_model_1.default.findOne({ email });
     if (existingUser)
         throw appError("An account with this email already exists.", 409);
-    const user = await user_model_1.default.create({ name, email, password });
-    return { user: serializeUser(user), token: createToken(user._id.toString()) };
+    if (!process.env.JWT_SECRET)
+        throw appError("JWT_SECRET is not configured.", 500);
+    try {
+        const user = await user_model_1.default.create({ name, email, password });
+        return { user: serializeUser(user), token: createToken(user._id.toString()) };
+    }
+    catch (error) {
+        if (error?.code === 11000)
+            throw appError("An account with this email already exists.", 409);
+        throw error;
+    }
 };
 const login = async (body) => {
     const email = normaliseEmail(body.email);
@@ -48,4 +63,8 @@ const login = async (body) => {
     }
     return { user: serializeUser(user), token: createToken(user._id.toString()) };
 };
-module.exports = { register, login };
+const getUser = async (userId) => {
+    const user = await user_model_1.default.findById(userId);
+    return user ? serializeUser(user) : null;
+};
+module.exports = { register, login, getUser };

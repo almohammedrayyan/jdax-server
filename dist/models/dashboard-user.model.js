@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose = require("mongoose");
 const dashboardUserSchema = new mongoose.Schema({
+    singletonKey: { type: String, unique: true, sparse: true },
     snapshotDate: { type: Date, required: true, default: Date.now },
     startDate: { type: Date, required: true, default: () => new Date("2020-01-01T00:00:00.000Z") },
     totalUsers: { type: Number, required: true, default: 0 },

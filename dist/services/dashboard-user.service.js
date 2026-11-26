@@ -43,12 +43,30 @@ const getMetrics = async () => {
 };
 const saveTodaySnapshot = async () => {
     await removeLegacyDailySnapshotIndex();
+    await DashboardUser.init();
     const metrics = await getMetrics();
-    return DashboardUser.create({
+    const snapshot = {
         ...metrics,
         snapshotDate: new Date(),
         startDate: new Date("2020-01-01T00:00:00.000Z"),
-    });
+    };
+    // Adopt the most recent existing record, preserving historical records.
+    // A unique key prevents overlapping cron runs from creating new records.
+    try {
+        const existing = await DashboardUser.findOne({ singletonKey: "dashboard" });
+        if (!existing) {
+            const latest = await DashboardUser.findOne({ singletonKey: { $exists: false } }).sort({ snapshotDate: -1 });
+            if (latest) {
+                return await DashboardUser.findByIdAndUpdate(latest._id, { $set: { ...snapshot, singletonKey: "dashboard" } }, { new: true, runValidators: true });
+            }
+        }
+        return await DashboardUser.findOneAndUpdate({ singletonKey: "dashboard" }, { $set: snapshot }, { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true });
+    }
+    catch (error) {
+        if (error?.code !== 11000)
+            throw error;
+        return DashboardUser.findOneAndUpdate({ singletonKey: "dashboard" }, { $set: snapshot }, { new: true, runValidators: true });
+    }
 };
 const getAllSnapshots = async () => DashboardUser.find().sort({ snapshotDate: -1 });
 const getLatestSnapshot = async () => DashboardUser.findOne().sort({ snapshotDate: -1 });

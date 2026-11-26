@@ -15,7 +15,11 @@ const app = express();
 const allowedOrigins = [
   "https://jdax.in",
   "http://localhost:5173",
-  ...(process.env.ADMIN_ORIGINS ?? "").split(",").map((origin: string) => origin.trim()).filter(Boolean),
+  "http://localhost:5174",
+  ...(process.env.ADMIN_ORIGINS ?? "")
+    .split(",")
+    .map((origin: string) => origin.trim())
+    .filter(Boolean),
 ];
 const corsOptions = {
   origin: function (origin, callback) {
@@ -35,7 +39,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
-
 
 app.use("/api/events", eventRoutes);
 app.use("/api/contacts", contactRoutes);

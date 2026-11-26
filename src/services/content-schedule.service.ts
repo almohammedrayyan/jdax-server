@@ -10,6 +10,7 @@ type ContentSchedulePayload = {
   category?: string;
   group?: string | null;
   title?: string;
+  venue?: string;
   scheduledAt?: string | Date;
 };
 
@@ -29,6 +30,7 @@ const validationError = (message: string): StatusError => {
 const normalisePayload = (payload: ContentSchedulePayload, current: any = {}) => {
   const category = String(payload.category ?? current.category ?? "").trim().toLowerCase();
   const title = String(payload.title ?? current.title ?? "").trim();
+  const venue = String(payload.venue ?? current.venue ?? "").trim();
   const scheduledAtValue = payload.scheduledAt ?? current.scheduledAt;
   const scheduledAt = new Date(scheduledAtValue);
 
@@ -46,7 +48,7 @@ const normalisePayload = (payload: ContentSchedulePayload, current: any = {}) =>
     throw validationError(`TNPSC group must be one of: ${TNPSC_GROUPS.join(", ")}`);
   }
 
-  return { category, title, scheduledAt, group: category === "tnpsc" ? group : null };
+  return { category, title, venue, scheduledAt, group: category === "tnpsc" ? group : null };
 };
 
 const ensureValidId = (id: string) => {

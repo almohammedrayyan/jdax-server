@@ -10,6 +10,7 @@ const validationError = (message) => {
 const normalisePayload = (payload, current = {}) => {
     const category = String(payload.category ?? current.category ?? "").trim().toLowerCase();
     const title = String(payload.title ?? current.title ?? "").trim();
+    const venue = String(payload.venue ?? current.venue ?? "").trim();
     const scheduledAtValue = payload.scheduledAt ?? current.scheduledAt;
     const scheduledAt = new Date(scheduledAtValue);
     if (!CONTENT_CATEGORIES.includes(category)) {
@@ -25,7 +26,7 @@ const normalisePayload = (payload, current = {}) => {
     if (category === "tnpsc" && !TNPSC_GROUPS.includes(group)) {
         throw validationError(`TNPSC group must be one of: ${TNPSC_GROUPS.join(", ")}`);
     }
-    return { category, title, scheduledAt, group: category === "tnpsc" ? group : null };
+    return { category, title, venue, scheduledAt, group: category === "tnpsc" ? group : null };
 };
 const ensureValidId = (id) => {
     if (!mongoose.isValidObjectId(id))

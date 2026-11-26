@@ -34,6 +34,7 @@ const contentScheduleSchema = new Schema(
       trim: true,
     },
     title: { type: String, required: true, trim: true },
+    venue: { type: String, trim: true, default: "" },
     scheduledAt: { type: Date, required: true },
   },
   { timestamps: true },

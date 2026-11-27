@@ -4,6 +4,7 @@ const controller = require("../controllers/social-live-feed.controller");
 const router = express.Router();
 router.post("/", controller.createSocialLiveFeed);
 router.get("/", controller.getSocialLiveFeeds);
+router.get("/get-all", controller.getAllYouTubeVideos);
 router.get("/:id", controller.getSocialLiveFeedById);
 router.put("/:id", controller.updateSocialLiveFeed);
 router.delete("/:id", controller.deleteSocialLiveFeed);

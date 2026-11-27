@@ -39,6 +39,19 @@ const getSocialLiveFeedById = async (req, res) => {
         return sendError(res, error);
     }
 };
+const getAllYouTubeVideos = async (req, res) => {
+    try {
+        const pageToken = req.query.pageToken;
+        if (pageToken !== undefined && (typeof pageToken !== "string" || !pageToken.trim() || pageToken.length > 1024)) {
+            return res.status(400).send({ success: false, message: "Invalid page token.", data: null });
+        }
+        const data = await service.getAllYouTubeVideos(pageToken);
+        return res.status(200).send({ success: true, message: "YouTube videos fetched.", data });
+    }
+    catch (error) {
+        return sendError(res, error);
+    }
+};
 const updateSocialLiveFeed = async (req, res) => {
     try {
         const data = await service.update({ ...req.body, _id: req.params.id });
@@ -64,6 +77,7 @@ const deleteSocialLiveFeed = async (req, res) => {
 module.exports = {
     createSocialLiveFeed,
     getSocialLiveFeeds,
+    getAllYouTubeVideos,
     getSocialLiveFeedById,
     updateSocialLiveFeed,
     deleteSocialLiveFeed,

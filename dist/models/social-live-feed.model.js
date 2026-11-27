@@ -9,7 +9,7 @@ const socialLiveFeedSchema = new mongoose.Schema({
         lowercase: true,
         trim: true,
     },
-    link: {
+    accountId: {
         type: String,
         required: true,
         trim: true,

@@ -7,14 +7,16 @@ const validationError = (message) => {
     return error;
 };
 const normalisePayload = (payload, current = {}) => {
-    const platform = String(payload.platform ?? current.platform ?? "").trim().toLowerCase();
-    const link = String(payload.link ?? current.link ?? "").trim();
-    if (!['instagram', 'youtube'].includes(platform)) {
+    const platform = String(payload.platform ?? current.platform ?? "")
+        .trim()
+        .toLowerCase();
+    const accountId = String(payload.accountId ?? current.accountId ?? "").trim();
+    if (!["instagram", "youtube"].includes(platform)) {
         throw validationError("platform must be either instagram or youtube.");
     }
-    if (!link)
-        throw validationError("link is required.");
-    return { platform, link };
+    if (!accountId)
+        throw validationError("accountId is required.");
+    return { platform, accountId };
 };
 const ensureValidId = (id) => {
     if (!mongoose.isValidObjectId(id))
@@ -25,6 +27,71 @@ const create = async (body) => {
 };
 const getAll = async () => {
     return SocialLiveFeed.find().sort({ createdAt: -1 });
+};
+const getAllYouTubeVideos = async (pageToken) => {
+    const apiKey = process.env.YOUTUBE_API_KEY?.trim();
+    if (!apiKey) {
+        const error = new Error("YouTube API key is not configured.");
+        error.statusCode = 503;
+        throw error;
+    }
+    const account = await SocialLiveFeed.findOne({ platform: "youtube" }).sort({
+        createdAt: -1,
+    });
+    console.log(account, "acccouuun");
+    if (!account?.accountId?.trim()) {
+        const error = new Error("No YouTube social feed account ID is configured.");
+        error.statusCode = 404;
+        throw error;
+    }
+    const items = [];
+    let nextPageToken = pageToken || undefined;
+    // YouTube search permits at most 50 results per request.
+    for (let page = 0; page < 2; page++) {
+        const params = new URLSearchParams({
+            part: "snippet",
+            channelId: account.accountId.trim(),
+            type: "video",
+            order: "date",
+            maxResults: "50",
+            key: apiKey,
+        });
+        if (nextPageToken)
+            params.set("pageToken", nextPageToken);
+        let response;
+        try {
+            response = await fetch(`https://www.googleapis.com/youtube/v3/search?${params}`, { signal: AbortSignal.timeout(15000) });
+        }
+        catch {
+            const error = new Error("Unable to reach the YouTube API.");
+            error.statusCode = 502;
+            throw error;
+        }
+        if (!response.ok) {
+            const error = new Error("YouTube API request failed. Check the configured channel ID, API key and quota.");
+            error.statusCode = 502;
+            throw error;
+        }
+        let result;
+        try {
+            result = (await response.json());
+        }
+        catch {
+            const error = new Error("YouTube API returned an invalid response.");
+            error.statusCode = 502;
+            throw error;
+        }
+        if (!Array.isArray(result.items)) {
+            const error = new Error("YouTube API returned an invalid response.");
+            error.statusCode = 502;
+            throw error;
+        }
+        items.push(...result.items);
+        nextPageToken = result.nextPageToken;
+        if (!nextPageToken)
+            break;
+    }
+    return { items, nextPageToken: nextPageToken || null };
 };
 const getById = async (id) => {
     ensureValidId(id);
@@ -44,4 +111,4 @@ const remove = async (id) => {
     ensureValidId(id);
     return SocialLiveFeed.findByIdAndDelete(id);
 };
-module.exports = { create, getAll, getById, update, remove };
+module.exports = { create, getAll, getAllYouTubeVideos, getById, update, remove };

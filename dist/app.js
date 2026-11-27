@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-require("dotenv").config({ path: require("path").resolve(__dirname, "../.env") });
+require("dotenv").config({
+    path: require("path").resolve(__dirname, "../.env"),
+});
 const express = require("express");
 const cors = require("cors");
 const contentScheduleRoutes = require("./routes/content-schedule.routes");
@@ -15,6 +17,7 @@ const allowedOrigins = [
     "https://jdax.in",
     "http://localhost:5173",
     "http://localhost:5174",
+    "https://jdax-admin.netlify.app",
     ...(process.env.ADMIN_ORIGINS ?? "")
         .split(",")
         .map((origin) => origin.trim())

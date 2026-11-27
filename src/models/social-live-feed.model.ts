@@ -9,13 +9,13 @@ const socialLiveFeedSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
-    link: {
+    accountId: {
       type: String,
       required: true,
       trim: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("SocialLiveFeed", socialLiveFeedSchema);

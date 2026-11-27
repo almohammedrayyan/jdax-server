@@ -19,6 +19,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "https://jdax-admin.netlify.app",
+  "https://www.jdax.in",
   ...(process.env.ADMIN_ORIGINS ?? "")
     .split(",")
     .map((origin: string) => origin.trim())

@@ -19,6 +19,15 @@ const createContentSchedule = async (req, res) => {
         return sendError(res, error);
     }
 };
+const createBulkContentSchedules = async (req, res) => {
+    try {
+        const data = await service.createBulk(req.body?.rows);
+        return res.status(201).send({ success: true, message: `${data.length} content schedules created.`, data });
+    }
+    catch (error) {
+        return sendError(res, error);
+    }
+};
 const getContentSchedules = async (req, res) => {
     try {
         const data = await service.getAll(req.query);
@@ -63,6 +72,7 @@ const deleteContentSchedule = async (req, res) => {
 };
 module.exports = {
     createContentSchedule,
+    createBulkContentSchedules,
     getContentSchedules,
     getContentScheduleById,
     updateContentSchedule,

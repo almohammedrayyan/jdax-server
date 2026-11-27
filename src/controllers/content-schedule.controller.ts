@@ -23,6 +23,15 @@ const createContentSchedule = async (req: Request, res: Response) => {
   }
 };
 
+const createBulkContentSchedules = async (req: Request, res: Response) => {
+  try {
+    const data = await service.createBulk(req.body?.rows);
+    return res.status(201).send({ success: true, message: `${data.length} content schedules created.`, data });
+  } catch (error) {
+    return sendError(res, error as AppError);
+  }
+};
+
 const getContentSchedules = async (req: Request, res: Response) => {
   try {
     const data = await service.getAll(req.query);
@@ -64,6 +73,7 @@ const deleteContentSchedule = async (req: Request, res: Response) => {
 
 export = {
   createContentSchedule,
+  createBulkContentSchedules,
   getContentSchedules,
   getContentScheduleById,
   updateContentSchedule,

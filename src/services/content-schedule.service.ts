@@ -59,6 +59,24 @@ const create = async (body: ContentSchedulePayload) => {
   return ContentSchedule.create(normalisePayload(body));
 };
 
+const createBulk = async (rows: unknown) => {
+  if (!Array.isArray(rows) || rows.length === 0 || rows.length > 500) {
+    throw validationError("Provide between 1 and 500 schedule rows.");
+  }
+  const errors: string[] = [];
+  const schedules = rows.map((row, index) => {
+    try {
+      if (!row || typeof row !== "object" || Array.isArray(row)) throw validationError("Invalid row.");
+      return normalisePayload(row as ContentSchedulePayload);
+    } catch (error) {
+      errors.push(`Row ${index + 2}: ${error instanceof Error ? error.message : "Invalid row."}`);
+      return null;
+    }
+  });
+  if (errors.length) throw validationError(errors.join("\n"));
+  return ContentSchedule.insertMany(schedules, { ordered: true });
+};
+
 const getAll = async (filters: ContentScheduleFilters = {}) => {
   const query: { category?: string; group?: string } = {};
   if (filters.category) {
@@ -103,4 +121,4 @@ const remove = async (id: string) => {
   return ContentSchedule.findByIdAndDelete(id);
 };
 
-module.exports = { create, getAll, getById, update, remove };
+module.exports = { create, createBulk, getAll, getById, update, remove };

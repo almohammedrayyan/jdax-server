@@ -35,6 +35,26 @@ const ensureValidId = (id) => {
 const create = async (body) => {
     return ContentSchedule.create(normalisePayload(body));
 };
+const createBulk = async (rows) => {
+    if (!Array.isArray(rows) || rows.length === 0 || rows.length > 500) {
+        throw validationError("Provide between 1 and 500 schedule rows.");
+    }
+    const errors = [];
+    const schedules = rows.map((row, index) => {
+        try {
+            if (!row || typeof row !== "object" || Array.isArray(row))
+                throw validationError("Invalid row.");
+            return normalisePayload(row);
+        }
+        catch (error) {
+            errors.push(`Row ${index + 2}: ${error instanceof Error ? error.message : "Invalid row."}`);
+            return null;
+        }
+    });
+    if (errors.length)
+        throw validationError(errors.join("\n"));
+    return ContentSchedule.insertMany(schedules, { ordered: true });
+};
 const getAll = async (filters = {}) => {
     const query = {};
     if (filters.category) {
@@ -71,4 +91,4 @@ const remove = async (id) => {
     ensureValidId(id);
     return ContentSchedule.findByIdAndDelete(id);
 };
-module.exports = { create, getAll, getById, update, remove };
+module.exports = { create, createBulk, getAll, getById, update, remove };
